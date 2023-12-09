@@ -1,9 +1,14 @@
 import streamlit as st
+import pandas as pd
 
-# Criar um aplicativo Streamlit
-st.title("Análise de Óbitos por COVID-19")
+# Carregar o dataset
+df = pd.read_csv('obito_cartorio.csv')
+
+# Converter a coluna 'date' para o formato de data
+df['date'] = pd.to_datetime(df['date'])
 
 # Página de Apresentação
+st.title("Análise de Óbitos por COVID-19")
 st.header("Bem-vindo à Análise de Óbitos por COVID-19")
 st.write(
     "Esta análise utiliza dados do dataset sobre óbitos por COVID-19. "
@@ -45,3 +50,27 @@ st.write(
     "Para análises mais detalhadas ou personalizadas, você pode acessar "
     "[páginas específicas](https://brasil.io/dataset/covid19/files/) relacionadas aos tópicos de interesse."
 )
+
+# Filtrar informações de mortes no total, por ano e por mês
+st.header("Análise de Óbitos por COVID-19")
+st.subheader("Total de Mortes")
+total_mortes = df['total'].sum()
+st.write(f"O total de mortes registradas é: {total_mortes}")
+
+# Filtrar por ano
+ano_selecionado = st.selectbox("Selecione um ano:", df['date'].dt.year.unique())
+df_ano = df[df['date'].dt.year == ano_selecionado]
+
+# Exibir total de mortes por ano
+st.subheader(f"Total de Mortes em {ano_selecionado}")
+total_mortes_ano = df_ano['total'].sum()
+st.write(f"O total de mortes em {ano_selecionado} é: {total_mortes_ano}")
+
+# Filtrar por mês
+mes_selecionado = st.selectbox("Selecione um mês:", df_ano['date'].dt.month_name().unique())
+df_mes = df_ano[df_ano['date'].dt.month_name() == mes_selecionado]
+
+# Exibir total de mortes por mês no ano selecionado
+st.subheader(f"Total de Mortes em {mes_selecionado} de {ano_selecionado}")
+total_mortes_mes = df_mes['total'].sum()
+st.write(f"O total de mortes em {mes_selecionado} de {ano_selecionado} é: {total_mortes_mes}")
