@@ -26,11 +26,6 @@ if "date" not in df.columns:
 selected_state = st.sidebar.selectbox("Selecione um estado para filtrar:", df["state"].unique())
 filtered_df = df[df["state"] == selected_state]
 
-# Exibir total de mortes por motivo e ano na tabela de óbitos
-st.subheader(f"Total de Mortes por {motivo_selecionado} em {ano_selecionado_obito}")
-total_mortes_motivo_ano_obito = df_ano_obito[motivo_selecionado].sum()
-st.write(f"O total de mortes por {motivo_selecionado} em {ano_selecionado_obito} é: {total_mortes_motivo_ano_obito}")
-
 
 # Exibir o DataFrame filtrado por estado
 st.header(f"Visualização dos Dados para o Estado {selected_state}:")
