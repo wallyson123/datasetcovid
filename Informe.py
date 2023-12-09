@@ -1,75 +1,56 @@
 import streamlit as st
 import pandas as pd
 
-# Carregar o dataset
-df = pd.read_csv('obito_cartorio.csv')
+# Carregar os datasets
+df_obito = pd.read_csv('obito_cartorio.csv')
+df_boletim = pd.read_csv('boletim.csv')
 
-# Converter a coluna 'date' para o formato de data
-df['date'] = pd.to_datetime(df['date'])
+# Converter a coluna 'date' para o formato de data em ambos os DataFrames
+df_obito['date'] = pd.to_datetime(df_obito['date'])
+df_boletim['date'] = pd.to_datetime(df_boletim['date'])
 
 # Página de Apresentação
-st.title("Análise de Óbitos por COVID-19")
-st.header("Bem-vindo à Análise de Óbitos por COVID-19")
+st.title("Análise de Óbitos e Boletins por COVID-19")
+st.header("Bem-vindo à Análise de Óbitos e Boletins por COVID-19")
 st.write(
-    "Esta análise utiliza dados do dataset sobre óbitos por COVID-19. "
+    "Esta análise utiliza dados dos datasets sobre óbitos e boletins por COVID-19. "
     "O COVID-19 é uma doença respiratória causada pelo coronavírus SARS-CoV-2. "
-    "O dataset utilizado contém informações sobre óbitos registrados em cartórios."
+    "Os datasets utilizados contêm informações sobre óbitos registrados em cartórios e boletins."
 )
 
-# Link para o dataset no Brasil.IO
-st.write("Mais informações sobre o dataset podem ser encontradas (https://brasil.io/dataset/covid19/files/).")
+# Link para os datasets no Brasil.IO
+st.write("Mais informações sobre os datasets podem ser encontradas em (https://brasil.io/dataset/covid19/files/).")
 
-# Exibir informações gerais
-st.header("Informações Gerais")
-st.write("Aqui estão algumas informações gerais sobre a análise:")
+# Filtrar dados específicos da tabela de óbitos
+st.header("Dados Específicos da Tabela de Óbitos")
+selected_columns_obito = st.multiselect("Selecione as colunas a serem exibidas (Óbitos):", df_obito.columns)
+if selected_columns_obito:
+    st.write(df_obito[selected_columns_obito])
 
-# Adicione mais informações gerais conforme necessário
-st.write(
-    "- Esta análise considera dados de óbitos registrados em cartórios em todo o Brasil."
-)
-st.write(
-    "- As informações são provenientes do dataset público disponibilizado pelo Brasil.IO."
-)
-st.write(
-    "- Para uma análise mais detalhada, consulte os dados brutos e a documentação completa do dataset."
-)
+# Filtrar informações de mortes por motivo e ano na tabela de óbitos
+st.header("Análise de Óbitos por Motivo e Ano")
+motivos_mortes = df_obito.columns[df_obito.columns.str.startswith('deaths_')].tolist()
+motivo_selecionado = st.selectbox("Selecione um motivo de morte:", motivos_mortes)
 
-# Adicionar link para dados brutos
-st.subheader("Dados Brutos")
-st.write(
-    "Os dados brutos deste dataset estão disponíveis [aqui](https://brasil.io/dataset/covid19/files/)."
-)
+# Filtrar por ano na tabela de óbitos
+ano_selecionado_obito = st.selectbox("Selecione um ano (Óbitos):", df_obito['date'].dt.year.unique())
+df_ano_obito = df_obito[df_obito['date'].dt.year == int(ano_selecionado_obito)]
 
-# Exibir conclusões ou análises
-st.header("Conclusões e Análises")
-st.write("Neste espaço, você pode adicionar conclusões ou análises adicionais.")
+# Exibir total de mortes por motivo e ano na tabela de óbitos
+st.subheader(f"Total de Mortes por {motivo_selecionado} em {ano_selecionado_obito}")
+total_mortes_motivo_ano_obito = df_ano_obito[motivo_selecionado].sum()
+st.write(f"O total de mortes por {motivo_selecionado} em {ano_selecionado_obito} é: {total_mortes_motivo_ano_obito}")
 
-# Adicionar link para análises aprofundadas
-st.subheader("Análises Aprofundadas")
-st.write(
-    "Para análises mais detalhadas ou personalizadas, você pode acessar "
-    "[páginas específicas](https://brasil.io/dataset/covid19/files/) relacionadas aos tópicos de interesse."
-)
+# Filtrar dados específicos da tabela de boletins
+st.header("Dados Específicos da Tabela de Boletins")
+selected_columns_boletim = st.multiselect("Selecione as colunas a serem exibidas (Boletins):", df_boletim.columns)
+if selected_columns_boletim:
+    st.write(df_boletim[selected_columns_boletim])
 
-# Exibir dados específicos da tabela
-st.header("Dados Específicos da Tabela")
-selected_columns = st.multiselect("Selecione as colunas a serem exibidas:", df.columns)
-if selected_columns:
-    st.write(df[selected_columns])
+# Filtrar por ano na tabela de boletins
+ano_selecionado_boletim = st.selectbox("Selecione um ano (Boletins):", df_boletim['date'].dt.year.unique())
+df_ano_boletim = df_boletim[df_boletim['date'].dt.year == int(ano_selecionado_boletim)]
 
-# Filtrar informações de mortes no total, por ano e por mês
-st.header("Análise de Óbitos por COVID-19")
-ano_selecionado = st.selectbox("Selecione um ano:", ['2019', '2020'])
-
-# Filtrar por ano
-df_ano = df[df['date'].dt.year == int(ano_selecionado)]
-
-# Exibir total de mortes por ano
-st.subheader(f"Total de Mortes em {ano_selecionado}")
-total_mortes_ano = df_ano[f'deaths_total_{ano_selecionado}'].sum()
-st.write(f"O total de mortes em {ano_selecionado} é: {total_mortes_ano}")
-
-# Exibir total de novas mortes por ano
-st.subheader(f"Novas Mortes em {ano_selecionado}")
-total_novas_mortes_ano = df_ano[f'new_deaths_total_{ano_selecionado}'].sum()
-st.write(f"O total de novas mortes em {ano_selecionado} é: {total_novas_mortes_ano}")
+# Exibir dados completos da tabela de boletins
+st.subheader(f"Boletins em {ano_selecionado_boletim}")
+st.write(df_ano_boletim)
