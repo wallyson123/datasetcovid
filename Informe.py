@@ -21,6 +21,11 @@ st.write(
 # Link para os datasets no Brasil.IO
 st.write("Mais informações sobre os datasets podem ser encontradas em (https://brasil.io/dataset/covid19/files/).")
 
+# Contagem total de mortos durante toda a pandemia
+total_mortes_pandemia = df_obito['deaths_total_2020'].sum() + df_obito['deaths_total_2019'].sum()
+st.subheader(f"Total de Mortes durante a Pandemia")
+st.write(f"O total de mortes durante a pandemia é: {total_mortes_pandemia}")
+
 # Filtrar dados específicos da tabela de óbitos
 st.header("Dados Específicos da Tabela de Óbitos")
 selected_columns_obito = st.multiselect("Selecione as colunas a serem exibidas (Óbitos):", df_obito.columns)
@@ -97,5 +102,20 @@ st.write("""
 # Informações sobre as Colunas - Tabela de Boletins
 st.subheader("Informações sobre as Colunas - Tabela de Boletins")
 st.write("""
-- Adicione informações sobre as colunas da tabela de boletins conforme necessário.
+- date: Data do registro do boletim.
+- notes: Notas relacionadas ao boletim.
+- state: Estado ao qual o boletim está associado.
+- url: URL relacionada ao boletim.
 """)
+
+# Total de Colunas, Linhas e Tabelas
+total_colunas_obito = df_obito.shape[1]
+total_linhas_obito = df_obito.shape[0]
+total_colunas_boletim = df_boletim.shape[1]
+total_linhas_boletim = df_boletim.shape[0]
+
+st.subheader("Total de Colunas, Linhas e Tabelas")
+st.write(f"Total de colunas na tabela de óbitos: {total_colunas_obito}")
+st.write(f"Total de linhas na tabela de óbitos: {total_linhas_obito}")
+st.write(f"Total de colunas na tabela de boletins: {total_colunas_boletim}")
+st.write(f"Total de linhas na tabela de boletins: {total_linhas_boletim}")
