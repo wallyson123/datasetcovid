@@ -59,13 +59,10 @@ if selected_columns:
 
 # Filtrar informações de mortes no total, por ano e por mês
 st.header("Análise de Óbitos por COVID-19")
-st.subheader("Total de Mortes")
-total_mortes_2020 = df['deaths_total_2020'].sum()
-st.write(f"O total de mortes registradas em 2020 é: {total_mortes_2020}")
+ano_selecionado = st.selectbox("Selecione um ano:", ['2019', '2020'])
 
 # Filtrar por ano
-ano_selecionado = st.selectbox("Selecione um ano:", df['date'].dt.year.unique())
-df_ano = df[df['date'].dt.year == ano_selecionado]
+df_ano = df[df['date'].dt.year == int(ano_selecionado)]
 
 # Exibir total de mortes por ano
 st.subheader(f"Total de Mortes em {ano_selecionado}")
