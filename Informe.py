@@ -41,6 +41,11 @@ st.subheader(f"Total de Mortes por {motivo_selecionado} em {ano_selecionado_obit
 total_mortes_motivo_ano_obito = df_ano_obito[motivo_selecionado].sum()
 st.write(f"O total de mortes por {motivo_selecionado} em {ano_selecionado_obito} é: {total_mortes_motivo_ano_obito}")
 
+# Mostrar a soma total de mortos na parte superior
+st.subheader("Soma Total de Mortos")
+total_mortes_obito = df_obito['deaths_total_2020'].sum()
+st.write(f"O total de mortes registradas em 2020 é: {total_mortes_obito}")
+
 # Filtrar dados específicos da tabela de boletins
 st.header("Dados Específicos da Tabela de Boletins")
 selected_columns_boletim = st.multiselect("Selecione as colunas a serem exibidas (Boletins):", df_boletim.columns)
@@ -54,3 +59,20 @@ df_ano_boletim = df_boletim[df_boletim['date'].dt.year == int(ano_selecionado_bo
 # Exibir dados completos da tabela de boletins
 st.subheader(f"Boletins em {ano_selecionado_boletim}")
 st.write(df_ano_boletim)
+
+# Explicação das colunas da tabela de óbitos
+st.header("Explicação das Colunas - Tabela de Óbitos")
+explicacoes_obito = {
+    "date": "Data do registro",
+    "state": "Estado onde ocorreu o óbito",
+    # Adicione mais explicações conforme necessário
+}
+st.write(explicacoes_obito)
+
+# Explicação das colunas da tabela de boletins
+st.header("Explicação das Colunas - Tabela de Boletins")
+explicacoes_boletim = {
+    "date": "Data do boletim",
+    # Adicione mais explicações conforme necessário
+}
+st.write(explicacoes_boletim)
