@@ -11,7 +11,6 @@ df_boletim['date'] = pd.to_datetime(df_boletim['date'])
 
 # Página de Apresentação
 st.title("Análise de Óbitos e Boletins por COVID-19")
-st.header("Bem-vindo à Análise de Óbitos e Boletins por COVID-19")
 st.write(
     "Esta análise utiliza dados dos datasets sobre óbitos e boletins por COVID-19. "
     "O COVID-19 é uma doença respiratória causada pelo coronavírus SARS-CoV-2. "
