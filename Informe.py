@@ -41,11 +41,6 @@ st.subheader(f"Total de Mortes por {motivo_selecionado} em {ano_selecionado_obit
 total_mortes_motivo_ano_obito = df_ano_obito[motivo_selecionado].sum()
 st.write(f"O total de mortes por {motivo_selecionado} em {ano_selecionado_obito} é: {total_mortes_motivo_ano_obito}")
 
-# Mostrar a soma total de mortos na parte superior
-st.subheader("Soma Total de Mortos")
-total_mortes_obito = df_obito['deaths_total_2020'].sum()
-st.write(f"O total de mortes registradas em 2020 é: {total_mortes_obito}")
-
 # Filtrar dados específicos da tabela de boletins
 st.header("Dados Específicos da Tabela de Boletins")
 selected_columns_boletim = st.multiselect("Selecione as colunas a serem exibidas (Boletins):", df_boletim.columns)
@@ -60,19 +55,47 @@ df_ano_boletim = df_boletim[df_boletim['date'].dt.year == int(ano_selecionado_bo
 st.subheader(f"Boletins em {ano_selecionado_boletim}")
 st.write(df_ano_boletim)
 
-# Explicação das colunas da tabela de óbitos
-st.header("Explicação das Colunas - Tabela de Óbitos")
-explicacoes_obito = {
-    "date": "Data do registro",
-    "state": "Estado onde ocorreu o óbito",
-    # Adicione mais explicações conforme necessário
-}
-st.write(explicacoes_obito)
+# Informações sobre as Colunas - Tabela de Óbitos
+st.subheader("Informações sobre as Colunas - Tabela de Óbitos")
+st.write("""
+- date: Data do registro.
+- state: Estado onde ocorreu o óbito.
+- epidemiological_week_2019: Semana epidemiológica no ano de 2019.
+- epidemiological_week_2020: Semana epidemiológica no ano de 2020.
+- deaths_indeterminate_2019: Número de óbitos com causa indeterminada no ano de 2019.
+- deaths_respiratory_failure_2019: Número de óbitos por insuficiência respiratória no ano de 2019.
+- deaths_others_2019: Número de óbitos por outras causas no ano de 2019.
+- deaths_pneumonia_2019: Número de óbitos por pneumonia no ano de 2019.
+- deaths_septicemia_2019: Número de óbitos por septicemia no ano de 2019.
+- deaths_sars_2019: Número de óbitos por SARS (Síndrome Respiratória Aguda Grave) no ano de 2019.
+- deaths_covid19: Número de óbitos por COVID-19.
+- deaths_indeterminate_2020: Número de óbitos com causa indeterminada no ano de 2020.
+- deaths_respiratory_failure_2020: Número de óbitos por insuficiência respiratória no ano de 2020.
+- deaths_others_2020: Número de óbitos por outras causas no ano de 2020.
+- deaths_pneumonia_2020: Número de óbitos por pneumonia no ano de 2020.
+- deaths_septicemia_2020: Número de óbitos por septicemia no ano de 2020.
+- deaths_sars_2020: Número de óbitos por SARS (Síndrome Respiratória Aguda Grave) no ano de 2020.
+- deaths_total_2019: Número total de óbitos no ano de 2019.
+- deaths_total_2020: Número total de óbitos no ano de 2020.
+- new_deaths_indeterminate_2019: Novos óbitos com causa indeterminada no ano de 2019.
+- new_deaths_respiratory_failure_2019: Novos óbitos por insuficiência respiratória no ano de 2019.
+- new_deaths_others_2019: Novos óbitos por outras causas no ano de 2019.
+- new_deaths_pneumonia_2019: Novos óbitos por pneumonia no ano de 2019.
+- new_deaths_septicemia_2019: Novos óbitos por septicemia no ano de 2019.
+- new_deaths_sars_2019: Novos óbitos por SARS (Síndrome Respiratória Aguda Grave) no ano de 2019.
+- new_deaths_covid19: Novos óbitos por COVID-19.
+- new_deaths_indeterminate_2020: Novos óbitos com causa indeterminada no ano de 2020.
+- new_deaths_respiratory_failure_2020: Novos óbitos por insuficiência respiratória no ano de 2020.
+- new_deaths_others_2020: Novos óbitos por outras causas no ano de 2020.
+- new_deaths_pneumonia_2020: Novos óbitos por pneumonia no ano de 2020.
+- new_deaths_septicemia_2020: Novos óbitos por septicemia no ano de 2020.
+- new_deaths_sars_2020: Novos óbitos por SARS (Síndrome Respiratória Aguda Grave) no ano de 2020.
+- new_deaths_total_2019: Novo total de óbitos no ano de 2019.
+- new_deaths_total_2020: Novo total de óbitos no ano de 2020.
+""")
 
-# Explicação das colunas da tabela de boletins
-st.header("Explicação das Colunas - Tabela de Boletins")
-explicacoes_boletim = {
-    "date": "Data do boletim",
-    # Adicione mais explicações conforme necessário
-}
-st.write(explicacoes_boletim)
+# Informações sobre as Colunas - Tabela de Boletins
+st.subheader("Informações sobre as Colunas - Tabela de Boletins")
+st.write("""
+- Adicione informações sobre as colunas da tabela de boletins conforme necessário.
+""")
