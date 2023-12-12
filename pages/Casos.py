@@ -26,11 +26,11 @@ st.header("Filtro de Casos por Incidência Mês a Mês:")
 df['date'] = pd.to_datetime(df['date'])
 # Adicionar uma nova coluna 'Month' para extrair o mês
 df['Month'] = df['date'].dt.month
-# Agrupar por mês e contar o número de casos
+# Agrupar por mês, estado e contar o número de casos
 monthly_incidence = df.groupby(['Month', 'state']).size().reset_index(name='Cases')
 
 # Exibir gráfico de barras para a incidência mês a mês
-st.bar_chart(monthly_incidence.set_index(['state', 'Month']))
+st.bar_chart(monthly_incidence)
 
 # Mapa dos estados mais afetados no Brasil
 st.header("Mapa dos Estados Mais Afetados no Brasil:")
