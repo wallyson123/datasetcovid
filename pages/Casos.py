@@ -53,7 +53,7 @@ total_cases_by_state = df.groupby('state').size().reset_index(name='Total Cases'
 # Criar um mapa usando Plotly Express para o Brasil
 fig = px.choropleth(total_cases_by_state,
                     locations='state',
-                    locationmode='country names',  # Use 'country names' for world maps
+                    locationmode='USA-states',  # Use 'USA-states' for state-level maps
                     color='Total Cases',  # Specify the column for color scale
                     color_continuous_scale='reds',  # Adjust color scale as needed
                     title=f'Estados Mais Afetados no Brasil - {selected_state}',
