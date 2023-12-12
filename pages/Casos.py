@@ -3,7 +3,7 @@ import streamlit as st
 import plotly.express as px
 
 # Carregar dados do CSV
-caminho_arquivo = "boletim.csv"
+caminho_arquivo = "obito_cartorio.csv"
 try:
     df = pd.read_csv(caminho_arquivo)
 except FileNotFoundError:
@@ -61,27 +61,37 @@ fig = px.choropleth(total_cases_by_state,
 # Atualizar o layout do mapa para exibir o Brasil
 fig.update_geos(projection_type="natural earth")
 
+# Debug: Print column names to verify correctness
+print("Column Names:", df.columns)
+
+# Debug: Print available columns for the selected state
+print("Available Columns for", selected_state, ":", filtered_df.columns)
+
 # Adicionar as informações de mortes no final do mapa
-total_deaths = df[df["state"] == selected_state][[
-    'deaths_indeterminate_2020',
-    'deaths_respiratory_failure_2020',
-    'deaths_others_2020',
-    'deaths_pneumonia_2020',
-    'deaths_septicemia_2020',
-    'deaths_sars_2020',
-    'deaths_covid19',
-    'new_deaths_indeterminate_2020',
-    'new_deaths_respiratory_failure_2020',
-    'new_deaths_others_2020',
-    'new_deaths_pneumonia_2020',
-    'new_deaths_septicemia_2020',
-    'new_deaths_sars_2020',
-    'new_deaths_total_2020'
-]].sum()
+try:
+    total_deaths = filtered_df[[
+        'deaths_indeterminate_2020',
+        'deaths_respiratory_failure_2020',
+        'deaths_others_2020',
+        'deaths_pneumonia_2020',
+        'deaths_septicemia_2020',
+        'deaths_sars_2020',
+        'deaths_covid19',
+        'new_deaths_indeterminate_2020',
+        'new_deaths_respiratory_failure_2020',
+        'new_deaths_others_2020',
+        'new_deaths_pneumonia_2020',
+        'new_deaths_septicemia_2020',
+        'new_deaths_sars_2020',
+        'new_deaths_total_2020'
+    ]].sum()
 
-# Exibir o mapa
-st.plotly_chart(fig)
+    # Exibir o mapa
+    st.plotly_chart(fig)
 
-# Exibir informações de mortes no final do mapa
-st.subheader("Total de Mortes por Categoria:")
-st.write(total_deaths)
+    # Exibir informações de mortes no final do mapa
+    st.subheader("Total de Mortes por Categoria:")
+    st.write(total_deaths)
+
+except KeyError as e:
+    st.error(f"Erro ao acessar colunas: {e}")
