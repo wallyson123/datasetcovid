@@ -37,17 +37,18 @@ st.header("Mapa dos Estados Mais Afetados no Brasil:")
 # Agrupar por estado e contar o número total de casos
 total_cases_by_state = df.groupby('state').size().reset_index(name='Total Cases')
 
-# Criar um mapa usando Plotly Express para o mundo
+# Criar um mapa usando Plotly Express para o Brasil
 fig_map = px.choropleth(total_cases_by_state,
                         locations='state',
                         locationmode='ISO-3',  # Use 'ISO-3' for world maps
                         color='Total Cases',
                         color_continuous_scale='reds',  # Adjust color scale as needed
-                        title='Estados Mais Afetados no Mundo',
-                        labels={'Total Cases': 'Número de Casos'}
+                        title='Estados Mais Afetados no Brasil',
+                        labels={'Total Cases': 'Número de Casos'},
+                        scope='south america'  # Specify the scope to 'south america' to focus on Brazil
                         )
-# Atualizar o layout do mapa para exibir o mundo
-fig_map.update_geos(projection_type="natural earth")
+# Atualizar o layout do mapa para exibir o Brasil
+fig_map.update_geos(projection_type="natural earth", showcoastlines=True, coastlinecolor="black")
 
 # Adicionar as informações de mortes no final do mapa
 try:
