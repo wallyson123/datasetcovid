@@ -20,49 +20,38 @@ if "date" not in df.columns:
     st.error("A coluna 'date' não está presente no DataFrame.")
     st.stop()
 
-# Filtro por estado
-selected_state = st.sidebar.selectbox("Selecione um estado para filtrar:", df["state"].unique())
-filtered_df = df[df["state"] == selected_state]
-
-# Exibir o DataFrame filtrado por estado
-st.header(f"Visualização dos Dados para o Estado {selected_state}:")
-st.dataframe(filtered_df)
-
-# Verificar se a coluna "date" está presente no DataFrame filtrado
-if "date" not in filtered_df.columns:
-    st.error("A coluna 'date' não está presente no DataFrame filtrado.")
-    st.stop()
-
 # Filtro de casos por incidência mês a mês
 st.header("Filtro de Casos por Incidência Mês a Mês:")
 # Converter a coluna 'date' para o tipo datetime
-filtered_df['date'] = pd.to_datetime(filtered_df['date'])
+df['date'] = pd.to_datetime(df['date'])
 # Adicionar uma nova coluna 'Month' para extrair o mês
-filtered_df['Month'] = filtered_df['date'].dt.month
+df['Month'] = df['date'].dt.month
 # Agrupar por mês e contar o número de casos
-monthly_incidence = filtered_df.groupby('Month').size().reset_index(name='Cases')
+monthly_incidence = df.groupby(['Month', 'state']).size().reset_index(name='Cases')
 
 # Exibir gráfico de barras para a incidência mês a mês
-st.bar_chart(monthly_incidence.set_index('Month'))
+st.bar_chart(monthly_incidence.set_index(['state', 'Month']))
 
 # Mapa dos estados mais afetados no Brasil
 st.header("Mapa dos Estados Mais Afetados no Brasil:")
 # Agrupar por estado e contar o número total de casos
 total_cases_by_state = df.groupby('state').size().reset_index(name='Total Cases')
 
-# Criar um mapa usando Plotly Express para o Brasil
-fig = px.choropleth(total_cases_by_state,
-                    locations='state',
-                    locationmode='USA-states',  # Use 'USA-states' for state-level maps
-                    color='Total Cases',  # Specify the column for color scale
-                    color_continuous_scale='reds',  # Adjust color scale as needed
-                    title=f'Estados Mais Afetados no Brasil - {selected_state}',
-                    labels={'Total Cases': 'Número de Casos'}
-                    )
+# Criar um mapa usando Plotly Express para o mundo
+fig_map = px.choropleth(total_cases_by_state,
+                        locations='state',
+                        locationmode='ISO-3',  # Use 'ISO-3' for world maps
+                        color='Total Cases',
+                        color_continuous_scale='reds',  # Adjust color scale as needed
+                        title='Estados Mais Afetados no Mundo',
+                        labels={'Total Cases': 'Número de Casos'}
+                        )
+# Atualizar o layout do mapa para exibir o mundo
+fig_map.update_geos(projection_type="natural earth")
 
 # Adicionar as informações de mortes no final do mapa
 try:
-    total_deaths = filtered_df[[
+    total_deaths = df[[
         'deaths_indeterminate_2020',
         'deaths_respiratory_failure_2020',
         'deaths_others_2020',
@@ -80,7 +69,7 @@ try:
     ]].sum()
 
     # Adicionar o total de mortes como uma anotação no mapa
-    fig.add_annotation(
+    fig_map.add_annotation(
         x=0.5,
         y=-0.1,
         text=f'Total de Mortes: {total_deaths["new_deaths_total_2020"]}',
@@ -89,11 +78,17 @@ try:
     )
 
     # Exibir o mapa
-    st.plotly_chart(fig)
+    st.plotly_chart(fig_map)
 
     # Exibir informações de mortes no final do mapa
     st.subheader("Total de Mortes por Categoria:")
     st.write(total_deaths)
+
+    # Gráfico de linha para o total de mortes por categoria
+    st.header("Total de Mortes por Categoria (Ordenado de Maior para Menor):")
+    total_deaths_sorted = total_deaths.sort_values(ascending=False)
+    fig_line = px.line(x=total_deaths_sorted.index, y=total_deaths_sorted.values, markers=True)
+    st.plotly_chart(fig_line)
 
 except KeyError as e:
     st.error(f"Erro ao acessar colunas: {e}")
