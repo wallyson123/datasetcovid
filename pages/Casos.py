@@ -54,18 +54,11 @@ total_cases_by_state = df.groupby('state').size().reset_index(name='Total Cases'
 fig = px.choropleth(total_cases_by_state,
                     locations='state',
                     locationmode='country names',  # Use 'country names' for world maps
-                    color='Total Cases',
-                    title='Estados Mais Afetados no Brasil',
+                    color='Total Cases',  # Specify the column for color scale
+                    color_continuous_scale='reds',  # Adjust color scale as needed
+                    title=f'Estados Mais Afetados no Brasil - {selected_state}',
                     labels={'Total Cases': 'Número de Casos'}
                     )
-# Atualizar o layout do mapa para exibir o Brasil
-fig.update_geos(projection_type="natural earth")
-
-# Debug: Print column names to verify correctness
-print("Column Names:", df.columns)
-
-# Debug: Print available columns for the selected state
-print("Available Columns for", selected_state, ":", filtered_df.columns)
 
 # Adicionar as informações de mortes no final do mapa
 try:
@@ -85,6 +78,15 @@ try:
         'new_deaths_sars_2020',
         'new_deaths_total_2020'
     ]].sum()
+
+    # Adicionar o total de mortes como uma anotação no mapa
+    fig.add_annotation(
+        x=0.5,
+        y=-0.1,
+        text=f'Total de Mortes: {total_deaths["new_deaths_total_2020"]}',
+        showarrow=False,
+        font=dict(size=12)
+    )
 
     # Exibir o mapa
     st.plotly_chart(fig)
