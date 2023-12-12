@@ -20,6 +20,9 @@ if "date" not in df.columns:
     st.error("A coluna 'date' não está presente no DataFrame.")
     st.stop()
 
+# Adicionar controle deslizante para escolher o número mínimo de mortes
+min_deaths = st.slider("Escolha o número mínimo de mortes para ser considerado 'mais afetado'", 0, 5000, 500)
+
 # Filtro de casos por incidência mês a mês
 st.header("Filtro de Casos por Incidência Mês a Mês:")
 # Converter a coluna 'date' para o tipo datetime
@@ -37,14 +40,32 @@ st.header("Mapa dos Estados Mais Afetados no Brasil:")
 # Agrupar por estado e contar o número total de casos
 total_cases_by_state = df.groupby('state').size().reset_index(name='Total Cases')
 
-# Criar um mapa usando Plotly Express para o Brasil
+# Agrupar por estado e somar o número total de mortes
+total_deaths_by_state = df.groupby('state')[[
+    'deaths_indeterminate_2020',
+    'deaths_respiratory_failure_2020',
+    'deaths_others_2020',
+    'deaths_pneumonia_2020',
+    'deaths_septicemia_2020',
+    'deaths_sars_2020',
+    'deaths_covid19',
+    'new_deaths_indeterminate_2020',
+    'new_deaths_respiratory_failure_2020',
+    'new_deaths_others_2020',
+    'new_deaths_pneumonia_2020',
+    'new_deaths_septicemia_2020',
+    'new_deaths_sars_2020',
+    'new_deaths_total_2020'
+]].sum()
+
+# Adicionar cores ao mapa com base no número de mortes
 fig_map = px.choropleth(total_cases_by_state,
                         locations='state',
                         locationmode='ISO-3',  # Use 'ISO-3' for world maps
-                        color='Total Cases',
+                        color=total_deaths_by_state['new_deaths_total_2020'],
                         color_continuous_scale='reds',  # Adjust color scale as needed
                         title='Estados Mais Afetados no Brasil',
-                        labels={'Total Cases': 'Número de Casos'},
+                        labels={'Total Cases': 'Número de Casos', 'color': 'Número de Mortes'},
                         scope='south america'  # Specify the scope to 'south america' to focus on Brazil
                         )
 # Atualizar o layout do mapa para exibir o Brasil
@@ -52,28 +73,11 @@ fig_map.update_geos(projection_type="natural earth", showcoastlines=True, coastl
 
 # Adicionar as informações de mortes no final do mapa
 try:
-    total_deaths = df[[
-        'deaths_indeterminate_2020',
-        'deaths_respiratory_failure_2020',
-        'deaths_others_2020',
-        'deaths_pneumonia_2020',
-        'deaths_septicemia_2020',
-        'deaths_sars_2020',
-        'deaths_covid19',
-        'new_deaths_indeterminate_2020',
-        'new_deaths_respiratory_failure_2020',
-        'new_deaths_others_2020',
-        'new_deaths_pneumonia_2020',
-        'new_deaths_septicemia_2020',
-        'new_deaths_sars_2020',
-        'new_deaths_total_2020'
-    ]].sum()
-
     # Adicionar o total de mortes como uma anotação no mapa
     fig_map.add_annotation(
         x=0.5,
         y=-0.1,
-        text=f'Total de Mortes: {total_deaths["new_deaths_total_2020"]}',
+        text=f'Total de Mortes: {total_deaths_by_state["new_deaths_total_2020"].sum()}',
         showarrow=False,
         font=dict(size=12)
     )
@@ -81,14 +85,17 @@ try:
     # Exibir o mapa
     st.plotly_chart(fig_map)
 
-    # Exibir informações de mortes no final do mapa
-    st.subheader("Total de Mortes por Categoria:")
-    st.write(total_deaths)
+    # Filtrar os estados mais afetados com base no número mínimo de mortes escolhido pelo usuário
+    most_affected_states = total_deaths_by_state[total_deaths_by_state['new_deaths_total_2020'] >= min_deaths]
 
-    # Gráfico de linha para o total de mortes por categoria
-    st.header("Total de Mortes por Categoria (Ordenado de Maior para Menor):")
-    total_deaths_sorted = total_deaths.sort_values(ascending=False)
-    fig_line = px.line(x=total_deaths_sorted.index, y=total_deaths_sorted.values, markers=True)
+    # Exibir informações de mortes para os estados mais afetados
+    st.subheader(f"Total de Mortes por Categoria nos Estados Mais Afetados (com mais de {min_deaths} mortes):")
+    st.write(most_affected_states)
+
+    # Gráfico de linha para o total de mortes por categoria nos estados mais afetados
+    st.header("Total de Mortes por Categoria (Ordenado de Maior para Menor) nos Estados Mais Afetados:")
+    most_affected_states_sorted = most_affected_states.sort_values(by='new_deaths_total_2020', ascending=False)
+    fig_line = px.line(x=most_affected_states_sorted.index, y=most_affected_states_sorted['new_deaths_total_2020'], markers=True)
     st.plotly_chart(fig_line)
 
 except KeyError as e:
