@@ -68,113 +68,59 @@ monthly_incidence_boletim = df_boletim.groupby(['Month', 'state']).size().reset_
 # Exibir gráfico de barras para a incidência mês a mês (boletim)
 st.bar_chart(monthly_incidence_boletim)
 
-# Mapa dos estados mais afetados no Brasil (óbito)
-st.header("Mapa dos Estados Mais Afetados no Brasil (óbito):")
-# Agrupar por estado e contar o número total de casos
-total_cases_by_state_obito = df_obito.groupby('state').size().reset_index(name='Total Cases (óbito)')
+# Combine data from both DataFrames to create a single DataFrame for the choropleth map
+df_combined = pd.merge(df_obito.groupby('state')['new_deaths_total_2020'].sum().reset_index(), df_boletim.groupby('state')['url'].count().reset_index(), on='state')
 
-# Adicionar cores ao mapa com base no número de mortes (óbito)
-fig_map_obito = px.choropleth(total_cases_by_state_obito,
-                              locations='state',
-                              locationmode='ISO-3',
-                              color=df_obito.groupby('state')['new_deaths_total_2020'].sum(),
-                              color_continuous_scale='reds',
-                              title='Estados Mais Afetados no Brasil (óbito)',
-                              labels={'Total Cases (óbito)': 'Número de Casos (óbito)', 'color': 'Número de Mortes (óbito)'},
-                              scope='south america'
-                              )
+# Mapa dos estados mais afetados no Brasil
+st.header("Mapa dos Estados Mais Afetados no Brasil:")
+# Adicionar cores ao mapa com base no número de mortes e casos
+fig_map_combined = px.choropleth(df_combined,
+                                  locations='state',
+                                  locationmode='ISO-3',
+                                  color='new_deaths_total_2020',
+                                  color_continuous_scale='reds',
+                                  title='Estados Mais Afetados no Brasil',
+                                  labels={'color': 'Número de Mortes'},
+                                  scope='south america'
+                                  )
 # Atualizar o layout do mapa para exibir o Brasil
-fig_map_obito.update_geos(projection_type="natural earth", showcoastlines=True, coastlinecolor="black")
+fig_map_combined.update_geos(projection_type="natural earth", showcoastlines=True, coastlinecolor="black")
 
-# Adicionar as informações de mortes no final do mapa (óbito)
+# Adicionar as informações de mortes e casos no final do mapa
 try:
-    # Adicionar o total de mortes (óbito) como uma anotação no mapa
-    fig_map_obito.add_annotation(
+    # Adicionar o total de mortes como uma anotação no mapa
+    fig_map_combined.add_annotation(
         x=0.5,
         y=-0.1,
-        text=f'Total de Mortes (óbito): {df_obito["new_deaths_total_2020"].sum()}',
+        text=f'Total de Mortes: {df_combined["new_deaths_total_2020"].sum()}',
         showarrow=False,
         font=dict(size=12)
     )
 
-    # Exibir o mapa (óbito)
-    st.plotly_chart(fig_map_obito)
-
-    # Filtrar os estados mais afetados com base no número mínimo de mortes escolhido pelo usuário (óbito)
-    most_affected_states_obito = df_obito.groupby('state')[[
-        'deaths_indeterminate_2020',
-        'deaths_respiratory_failure_2020',
-        'deaths_others_2020',
-        'deaths_pneumonia_2020',
-        'deaths_septicemia_2020',
-        'deaths_sars_2020',
-        'deaths_covid19',
-        'new_deaths_indeterminate_2020',
-        'new_deaths_respiratory_failure_2020',
-        'new_deaths_others_2020',
-        'new_deaths_pneumonia_2020',
-        'new_deaths_septicemia_2020',
-        'new_deaths_sars_2020',
-        'new_deaths_total_2020'
-    ]].sum()
-
-    # Exibir informações de mortes para os estados mais afetados (óbito)
-    st.subheader(f"Total de Mortes por Categoria nos Estados Mais Afetados (com mais de {min_deaths_obito} mortes) (óbito):")
-    st.write(most_affected_states_obito)
-
-    # Gráfico de linha para o total de mortes por categoria nos estados mais afetados (óbito)
-    st.header("Total de Mortes por Categoria (Ordenado de Maior para Menor) nos Estados Mais Afetados (óbito):")
-    most_affected_states_sorted_obito = most_affected_states_obito.sort_values(by='new_deaths_total_2020', ascending=False)
-    fig_line_obito = px.line(x=most_affected_states_sorted_obito.index, y=most_affected_states_sorted_obito['new_deaths_total_2020'], markers=True)
-    st.plotly_chart(fig_line_obito)
-
-except KeyError as e:
-    st.error(f"Erro ao acessar colunas (óbito): {e}")
-
-# Mapa dos estados mais afetados no Brasil (boletim)
-st.header("Mapa dos Estados Mais Afetados no Brasil (boletim):")
-# Agrupar por estado e contar o número total de casos no boletim
-total_cases_by_state_boletim = df_boletim.groupby('state').size().reset_index(name='Total Cases (boletim)')
-
-# Adicionar cores ao mapa com base no número de mortes no boletim
-fig_map_boletim = px.choropleth(total_cases_by_state_boletim,
-                                locations='state',
-                                locationmode='ISO-3',
-                                color=df_boletim.groupby('state')['url'].count(),  # Replace 'url' with the correct column
-                                color_continuous_scale='reds',
-                                title='Estados Mais Afetados no Brasil (boletim)',
-                                labels={'Total Cases (boletim)': 'Número de Casos (boletim)', 'color': 'Número de Mortes (boletim)'},
-                                scope='south america'
-                                )
-# Atualizar o layout do mapa para exibir o Brasil
-fig_map_boletim.update_geos(projection_type="natural earth", showcoastlines=True, coastlinecolor="black")
-
-# Adicionar as informações de mortes no final do mapa (boletim)
-try:
-    # Adicionar o total de mortes (boletim) como uma anotação no mapa
-    fig_map_boletim.add_annotation(
+    # Adicionar o total de casos como uma anotação no mapa
+    fig_map_combined.add_annotation(
         x=0.5,
-        y=-0.1,
-        text=f'Total de Mortes (boletim): {df_boletim["new_deaths_total_2020"].sum()}',
+        y=-0.15,
+        text=f'Total de Casos: {df_combined["url"].sum()}',
         showarrow=False,
         font=dict(size=12)
     )
 
-    # Exibir o mapa (boletim)
-    st.plotly_chart(fig_map_boletim)
+    # Exibir o mapa
+    st.plotly_chart(fig_map_combined)
 
     # Filtrar os estados mais afetados com base no número mínimo de mortes escolhido pelo usuário
-    most_affected_states = total_deaths_by_state[total_deaths_by_state['new_deaths_total_2020'] >= min_deaths]
+    most_affected_states_combined = df_combined[df_combined['new_deaths_total_2020'] >= min_deaths_obito]
 
     # Exibir informações de mortes para os estados mais afetados
-    st.subheader(f"Total de Mortes por Categoria nos Estados Mais Afetados (com mais de {min_deaths} mortes):")
-    st.write(most_affected_states)
+    st.subheader(f"Total de Mortes por Categoria nos Estados Mais Afetados (com mais de {min_deaths_obito} mortes):")
+    st.write(most_affected_states_combined)
 
     # Gráfico de linha para o total de mortes por categoria nos estados mais afetados
     st.header("Total de Mortes por Categoria (Ordenado de Maior para Menor) nos Estados Mais Afetados:")
-    most_affected_states_sorted = most_affected_states.sort_values(by='new_deaths_total_2020', ascending=False)
-    fig_line = px.line(x=most_affected_states_sorted.index, y=most_affected_states_sorted['new_deaths_total_2020'], markers=True)
-    st.plotly_chart(fig_line)
+    most_affected_states_sorted_combined = most_affected_states_combined.sort_values(by='new_deaths_total_2020', ascending=False)
+    fig_line_combined = px.line(x=most_affected_states_sorted_combined['state'], y=most_affected_states_sorted_combined['new_deaths_total_2020'], markers=True)
+    st.plotly_chart(fig_line_combined)
 
 except KeyError as e:
     st.error(f"Erro ao acessar colunas: {e}")
