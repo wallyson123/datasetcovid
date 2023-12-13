@@ -77,7 +77,7 @@ total_cases_by_state_obito = df_obito.groupby('state').size().reset_index(name='
 fig_map_obito = px.choropleth(total_cases_by_state_obito,
                               locations='state',
                               locationmode='ISO-3',
-                              color=df_obito.groupby('state')['new_deaths_total_2020'].sum(),  # Modify this line
+                              color=df_obito.groupby('state')['new_deaths_total_2020'].sum(),
                               color_continuous_scale='reds',
                               title='Estados Mais Afetados no Brasil (óbito)',
                               labels={'Total Cases (óbito)': 'Número de Casos (óbito)', 'color': 'Número de Mortes (óbito)'},
@@ -92,7 +92,7 @@ try:
     fig_map_obito.add_annotation(
         x=0.5,
         y=-0.1,
-        text=f'Total de Mortes (óbito): {df_obito["new_deaths_total_2020"].sum()}',  # Modify this line
+        text=f'Total de Mortes (óbito): {df_obito["new_deaths_total_2020"].sum()}',
         showarrow=False,
         font=dict(size=12)
     )
@@ -140,7 +140,7 @@ total_cases_by_state_boletim = df_boletim.groupby('state').size().reset_index(na
 fig_map_boletim = px.choropleth(total_cases_by_state_boletim,
                                 locations='state',
                                 locationmode='ISO-3',
-                                color=df_boletim.groupby('state')['new_deaths_total_2020'].sum(),  # Modify this line
+                                color=df_boletim.groupby('state')['new_deaths_total_2020'].sum(),
                                 color_continuous_scale='reds',
                                 title='Estados Mais Afetados no Brasil (boletim)',
                                 labels={'Total Cases (boletim)': 'Número de Casos (boletim)', 'color': 'Número de Mortes (boletim)'},
@@ -155,7 +155,7 @@ try:
     fig_map_boletim.add_annotation(
         x=0.5,
         y=-0.1,
-        text=f'Total de Mortes (boletim): {df_boletim["new_deaths_total_2020"].sum()}',  # Modify this line
+        text=f'Total de Mortes (boletim): {df_boletim["new_deaths_total_2020"].sum()}',
         showarrow=False,
         font=dict(size=12)
     )
