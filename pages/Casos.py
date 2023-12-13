@@ -73,29 +73,11 @@ st.header("Mapa dos Estados Mais Afetados no Brasil (óbito):")
 # Agrupar por estado e contar o número total de casos
 total_cases_by_state_obito = df_obito.groupby('state').size().reset_index(name='Total Cases (óbito)')
 
-# Agrupar por estado e somar o número total de mortes (óbito)
-total_deaths_by_state_obito = df_obito.groupby('state')[[
-    'deaths_indeterminate_2020',
-    'deaths_respiratory_failure_2020',
-    'deaths_others_2020',
-    'deaths_pneumonia_2020',
-    'deaths_septicemia_2020',
-    'deaths_sars_2020',
-    'deaths_covid19',
-    'new_deaths_indeterminate_2020',
-    'new_deaths_respiratory_failure_2020',
-    'new_deaths_others_2020',
-    'new_deaths_pneumonia_2020',
-    'new_deaths_septicemia_2020',
-    'new_deaths_sars_2020',
-    'new_deaths_total_2020'
-]].sum()
-
 # Adicionar cores ao mapa com base no número de mortes (óbito)
 fig_map_obito = px.choropleth(total_cases_by_state_obito,
                               locations='state',
                               locationmode='ISO-3',
-                              color=total_deaths_by_state_obito['new_deaths_total_2020'],
+                              color=df_obito.groupby('state')['new_deaths_total_2020'].sum(),  # Modify this line
                               color_continuous_scale='reds',
                               title='Estados Mais Afetados no Brasil (óbito)',
                               labels={'Total Cases (óbito)': 'Número de Casos (óbito)', 'color': 'Número de Mortes (óbito)'},
@@ -110,7 +92,7 @@ try:
     fig_map_obito.add_annotation(
         x=0.5,
         y=-0.1,
-        text=f'Total de Mortes (óbito): {total_deaths_by_state_obito["new_deaths_total_2020"].sum()}',
+        text=f'Total de Mortes (óbito): {df_obito["new_deaths_total_2020"].sum()}',  # Modify this line
         showarrow=False,
         font=dict(size=12)
     )
@@ -119,7 +101,22 @@ try:
     st.plotly_chart(fig_map_obito)
 
     # Filtrar os estados mais afetados com base no número mínimo de mortes escolhido pelo usuário (óbito)
-    most_affected_states_obito = total_deaths_by_state_obito[total_deaths_by_state_obito['new_deaths_total_2020'] >= min_deaths_obito]
+    most_affected_states_obito = df_obito.groupby('state')[[
+        'deaths_indeterminate_2020',
+        'deaths_respiratory_failure_2020',
+        'deaths_others_2020',
+        'deaths_pneumonia_2020',
+        'deaths_septicemia_2020',
+        'deaths_sars_2020',
+        'deaths_covid19',
+        'new_deaths_indeterminate_2020',
+        'new_deaths_respiratory_failure_2020',
+        'new_deaths_others_2020',
+        'new_deaths_pneumonia_2020',
+        'new_deaths_septicemia_2020',
+        'new_deaths_sars_2020',
+        'new_deaths_total_2020'
+    ]].sum()
 
     # Exibir informações de mortes para os estados mais afetados (óbito)
     st.subheader(f"Total de Mortes por Categoria nos Estados Mais Afetados (com mais de {min_deaths_obito} mortes) (óbito):")
@@ -139,29 +136,11 @@ st.header("Mapa dos Estados Mais Afetados no Brasil (boletim):")
 # Agrupar por estado e contar o número total de casos no boletim
 total_cases_by_state_boletim = df_boletim.groupby('state').size().reset_index(name='Total Cases (boletim)')
 
-# Agrupar por estado e somar o número total de mortes no boletim
-total_deaths_by_state_boletim = df_boletim.groupby('state')[[
-    'deaths_indeterminate_2020',
-    'deaths_respiratory_failure_2020',
-    'deaths_others_2020',
-    'deaths_pneumonia_2020',
-    'deaths_septicemia_2020',
-    'deaths_sars_2020',
-    'deaths_covid19',
-    'new_deaths_indeterminate_2020',
-    'new_deaths_respiratory_failure_2020',
-    'new_deaths_others_2020',
-    'new_deaths_pneumonia_2020',
-    'new_deaths_septicemia_2020',
-    'new_deaths_sars_2020',
-    'new_deaths_total_2020'
-]].sum()
-
 # Adicionar cores ao mapa com base no número de mortes no boletim
 fig_map_boletim = px.choropleth(total_cases_by_state_boletim,
                                 locations='state',
                                 locationmode='ISO-3',
-                                color=total_deaths_by_state_boletim['new_deaths_total_2020'],
+                                color=df_boletim.groupby('state')['new_deaths_total_2020'].sum(),  # Modify this line
                                 color_continuous_scale='reds',
                                 title='Estados Mais Afetados no Brasil (boletim)',
                                 labels={'Total Cases (boletim)': 'Número de Casos (boletim)', 'color': 'Número de Mortes (boletim)'},
@@ -176,7 +155,7 @@ try:
     fig_map_boletim.add_annotation(
         x=0.5,
         y=-0.1,
-        text=f'Total de Mortes (boletim): {total_deaths_by_state_boletim["new_deaths_total_2020"].sum()}',
+        text=f'Total de Mortes (boletim): {df_boletim["new_deaths_total_2020"].sum()}',  # Modify this line
         showarrow=False,
         font=dict(size=12)
     )
