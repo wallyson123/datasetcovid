@@ -9,6 +9,29 @@ df_boletim = pd.read_csv('boletim.csv')
 df_obito['date'] = pd.to_datetime(df_obito['date'])
 df_boletim['date'] = pd.to_datetime(df_boletim['date'])
 
+# Aplicar o tema COVID-19
+st.markdown(
+    """
+    <style>
+        body {
+            background-color: #f8f9fa;  /* Light gray background */
+            font-family: 'Arial', sans-serif;
+        }
+        .stApp {
+            max-width: 1200px;  /* Set max width for the app */
+            margin: 0 auto;     /* Center the app on the page */
+        }
+        .stMarkdown {
+            color: #1f1f1f;  /* Dark text color */
+        }
+        .stSelectbox {
+            background-color: #ffffff;  /* White background for select boxes */
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Página de Apresentação
 st.title("Análise de Óbitos e Boletins por COVID-19")
 st.write(
