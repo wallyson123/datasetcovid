@@ -1,6 +1,5 @@
 import pandas as pd
 import streamlit as st
-import plotly.graph_objects as go
 import plotly.express as px
 from geopy.geocoders import Nominatim
 
@@ -80,10 +79,13 @@ try:
     df_combined['lat'] = df_combined['location'].apply(lambda loc: loc.latitude if loc else None)
     df_combined['lon'] = df_combined['location'].apply(lambda loc: loc.longitude if loc else None)
 
+    # Filtrar os estados mais afetados com base no número mínimo de mortes escolhido pelo usuário
+    most_affected_states_combined = df_combined[df_combined['new_deaths_total_2020'] >= min_deaths_obito]
+
     # Mapa dos estados mais afetados no Brasil
     st.header("Mapa dos Estados Mais Afetados no Brasil:")
-    # Adicionar cores ao mapa com base no número de mortes e casos
-    fig_map_combined = px.scatter_geo(df_combined,
+    # Exibir o mapa
+    fig_map_combined = px.scatter_geo(most_affected_states_combined,
                                       locations='state',
                                       locationmode='geojson-id',  # Use 'geojson-id' for Brazil map
                                       geojson='https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson',  # Brazil geojson file
@@ -93,9 +95,6 @@ try:
                                       labels={'color': 'Número de Mortes'},
                                       scope='south america'
                                       )
-
-    # Ajustar o layout do mapa para exibir o Brasil de forma mais ampla
-    fig_map_combined.update_geos(projection_type="mercator", visible=False, center={"lat": -15.77972, "lon": -47.92972}, scope="south america")
 
     # Adicionar as informações de mortes e casos no final do mapa
     try:
@@ -116,30 +115,6 @@ try:
             showarrow=False,
             font=dict(size=12)
         )
-
-        # Filtrar os estados mais afetados com base no número mínimo de mortes escolhido pelo usuário
-        most_affected_states_combined = df_combined[df_combined['new_deaths_total_2020'] >= min_deaths_obito]
-
-        # Destacar os estados mais afetados no mapa
-        fig_map_combined.update_geos(fitbounds="locations", visible=False)
-
-        # Adicionar marcadores para os estados mais afetados
-        for state in most_affected_states_combined['state']:
-            fig_map_combined.add_trace(
-                go.Scattergeo(
-                    locationmode='geojson-id',
-                    geojson='https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson',  # Brazil geojson file
-                    lon=[most_affected_states_combined[most_affected_states_combined['state'] == state]['lon'].iloc[0]],
-                    lat=[most_affected_states_combined[most_affected_states_combined['state'] == state]['lat'].iloc[0]],
-                    text=[state],
-                    mode='markers',
-                    marker=dict(
-                        size=10,
-                        color='red',
-                        line=dict(width=0.5, color='rgba(255, 0, 0, 0.8)'),
-                    )
-                )
-            )
 
         # Exibir o mapa
         st.plotly_chart(fig_map_combined)
