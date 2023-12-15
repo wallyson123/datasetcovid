@@ -146,7 +146,9 @@ try:
 
         # Exibir informações de mortes para os estados mais afetados
         st.subheader(f"Total de Mortes por Categoria nos Estados Mais Afetados (com mais de {min_deaths_obito} mortes):")
-        st.write(most_affected_states_combined)
+        # Select only specific columns for display to avoid ArrowInvalid error
+        most_affected_states_combined_subset = most_affected_states_combined[['state', 'new_deaths_total_2020']]
+        st.write(most_affected_states_combined_subset)
 
         # Gráfico de linha para o total de mortes por categoria nos estados mais afetados
         st.header("Total de Mortes por Categoria (Ordenado de Maior para Menor) nos Estados Mais Afetados:")
