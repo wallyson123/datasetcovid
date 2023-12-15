@@ -83,7 +83,7 @@ try:
     # Mapa dos estados mais afetados no Brasil
     st.header("Mapa dos Estados Mais Afetados no Brasil:")
     # Adicionar cores ao mapa com base no número de mortes e casos
-    fig_map_combined = px.choropleth(df_combined,
+    fig_map_combined = px.scatter_geo(df_combined,
                                       locations='state',
                                       locationmode='geojson-id',  # Use 'geojson-id' for Brazil map
                                       geojson='https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson',  # Brazil geojson file
