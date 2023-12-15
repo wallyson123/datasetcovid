@@ -2,39 +2,9 @@ import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
 import plotly.express as px
+from geopy.geocoders import Nominatim
 
-# Carregar dados do CSV (obito_cartorio.csv)
-caminho_arquivo_obito = "obito_cartorio.csv"
-try:
-    df_obito = pd.read_csv(caminho_arquivo_obito)
-except FileNotFoundError:
-    st.error(f"Arquivo não encontrado: {caminho_arquivo_obito}")
-    st.stop()
-
-# Verificar se a coluna "state" está presente no DataFrame do óbito
-if "state" not in df_obito.columns:
-    st.error("A coluna 'state' não está presente no DataFrame do óbito.")
-    st.stop()
-
-# Verificar se a coluna "date" está presente no DataFrame do óbito
-if "date" not in df_obito.columns:
-    st.error("A coluna 'date' não está presente no DataFrame do óbito.")
-    st.stop()
-
-# Adicionar controle deslizante para escolher o número mínimo de mortes
-min_deaths_obito = st.slider("Escolha o número mínimo de mortes para ser considerado 'mais afetado' (óbito)", 0, 5000, 500)
-
-# Filtro de casos por incidência mês a mês (óbito)
-st.header("Filtro de Casos por Incidência Mês a Mês (óbito):")
-# Converter a coluna 'date' para o tipo datetime
-df_obito['date'] = pd.to_datetime(df_obito['date'])
-# Adicionar uma nova coluna 'Month' para extrair o mês
-df_obito['Month'] = df_obito['date'].dt.month
-# Agrupar por mês, estado e contar o número de casos
-monthly_incidence_obito = df_obito.groupby(['Month', 'state']).size().reset_index(name='Cases')
-
-# Exibir gráfico de barras para a incidência mês a mês (óbito)
-st.bar_chart(monthly_incidence_obito)
+# ... (rest of the code remains unchanged)
 
 # Carregar dados do novo CSV (boletim.csv)
 caminho_arquivo_boletim = "boletim.csv"
@@ -71,6 +41,12 @@ st.bar_chart(monthly_incidence_boletim)
 
 # Combine data from both DataFrames to create a single DataFrame for the choropleth map
 df_combined = pd.merge(df_obito.groupby('state')['new_deaths_total_2020'].sum().reset_index(), df_boletim.groupby('state')['url'].count().reset_index(), on='state')
+
+# Obter coordenadas (latitude e longitude) para cada estado usando geopy
+geolocator = Nominatim(user_agent="my_geocoder")
+df_combined['location'] = df_combined['state'].apply(geolocator.geocode)
+df_combined['lat'] = df_combined['location'].apply(lambda loc: loc.latitude if loc else None)
+df_combined['lon'] = df_combined['location'].apply(lambda loc: loc.longitude if loc else None)
 
 # Mapa dos estados mais afetados no Brasil
 st.header("Mapa dos Estados Mais Afetados no Brasil:")
@@ -121,8 +97,8 @@ try:
             go.Scattergeo(
                 locationmode='geojson-id',
                 geojson='https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson',  # Brazil geojson file
-                lon=[df_combined[df_combined['state'] == state]['lon'].iloc[0]],
-                lat=[df_combined[df_combined['state'] == state]['lat'].iloc[0]],
+                lon=[most_affected_states_combined[most_affected_states_combined['state'] == state]['lon'].iloc[0]],
+                lat=[most_affected_states_combined[most_affected_states_combined['state'] == state]['lat'].iloc[0]],
                 text=[state],
                 mode='markers',
                 marker=dict(
